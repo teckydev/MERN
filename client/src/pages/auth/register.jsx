@@ -1,33 +1,64 @@
-import { CommonForm } from "@/components/common/form"
-import { registerFormControls } from "@/config"
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { CommonForm } from "@/components/common/form";
+import { registerFormControls } from "@/config";
+import { useToast } from "@/hooks/use-toast";
+import { registerUser } from "@/store/auth-slice";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 
-const initialState ={
-    userName:'',
-    email:'',
-    password:''
-}
-export const AuthRegister=()=>{
-    const[formData,setFormData]=useState(initialState)
-    function onSubmit(){
-    }
-   console.log(formData);
+const initialState = {
+  userName: "",
+  email: "",
+  password: "",
+};
+export const AuthRegister = () => {
+  const [formData, setFormData] = useState(initialState);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  function onSubmit(event) {
+    event.preventDefault();
+    dispatch(registerUser(formData)).then((data) => {
+      console.log(data, "data");
+      if (data?.payload?.success) {
+        toast({
+          title: data?.payload?.message,
+        });
+        navigate("/auth/login");
+      }
+      else{
+        toast({
+          title: data?.payload?.message,
+          variant:"destructive",
+        });
+      }
+    });
+  }
+  console.log(formData);
 
-    return(
-        <div className="mx-auto w-full max-w-md space-y-6">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Create new account</h1>
-              <p>Already have an account
-                <Link className="font-medium  ml-2 text-primary hover:underline " to='/auth/login'>Login</Link>
-              </p>
-            </div>
-            <CommonForm formControls={registerFormControls}
-            buttonText={'Sign up'}
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={onSubmit}
-            ></CommonForm>
-        </div>
-    )
-}
+  return (
+    <div className="mx-auto w-full max-w-md space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Create new account
+        </h1>
+        <p>
+          Already have an account
+          <Link
+            className="font-medium  ml-2 text-primary hover:underline "
+            to="/auth/login"
+          >
+            Login
+          </Link>
+        </p>
+      </div>
+      <CommonForm
+        formControls={registerFormControls}
+        buttonText={"Sign up"}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={onSubmit}
+      ></CommonForm>
+    </div>
+  );
+};
