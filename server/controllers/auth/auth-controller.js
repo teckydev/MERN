@@ -7,7 +7,7 @@ const User = require("../../models/User");
 const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
   try {
-    const checkUser = await userName.findOne({ email });
+    const checkUser = await User.findOne({ email });
     if (checkUser)
       return res.json({
         success: false,
@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const checkUser = await userName.findOne({ email });
+    const checkUser = await User.findOne({ email });
     if(!checkUser) return res.json({
         success:false,
         message:"user doesn't exists ! please register first"
@@ -70,7 +70,29 @@ const loginUser = async (req, res) => {
 };
 
 //logout
+const logoutUser=(req,res)=>{
+  res.clearCookie('token').json({
+    success:true,
+    message:'Logged out successfully'
+  })
+}
 
 //auth-middleware
-
-module.exports = { registerUser, loginUser };
+const authMiddleware=async(req,res,next)=>{
+  const token =req.cookies.token;
+  if(!token) return res.status(401).json({
+    success:false,
+    message:'unautherised user!'
+  })
+  try{
+    const decoded = jwt.verify(token,'CLIENT_SECRET_KEY');
+    req.user=decoded;//return user information
+    next()
+  }catch(error){
+    res.status(401).json({
+      success: false,
+      message: "some error occured",
+    });
+  }
+}
+module.exports = { registerUser, loginUser,logoutUser,authMiddleware };
