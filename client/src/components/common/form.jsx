@@ -5,7 +5,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 
 
-export const CommonForm=({formControls,formData,onSubmit,buttonText,setFormData})=>{
+export const CommonForm=({formControls,formData,onSubmit,buttonText,setFormData,isBtnDisabled})=>{
     function renderInputByComponentType(getControlItem){
      let element = null;
      const value=formData[getControlItem.name] || '';
@@ -83,7 +83,7 @@ export const CommonForm=({formControls,formData,onSubmit,buttonText,setFormData}
                  </div>)
                 }
                 </div> 
-               <Button type="submit" className="mt-2 w-full">{buttonText || 'Submit'}</Button>
+               <Button disabled={isBtnDisabled} type="submit" className="mt-2 w-full">{buttonText || 'Submit'}</Button>
             </form>
         </div>
     )
